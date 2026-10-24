@@ -1,0 +1,62 @@
+{
+  "pr": "example — entitlement dedupe on retry",
+  "_note": "One finding per class. Run against the gate's built-in sample surface: finding_scope_gate.py --sample reproduces exactly this.",
+  "findings": [
+    {
+      "id": "F1",
+      "file": "app/Services/EntitlementService.php",
+      "line": 43,
+      "severity": "BLOCKER",
+      "claim": "seen($txnId) is checked but the txn id is never recorded, so the dedupe never takes effect on retry",
+      "_class": "DIFF-CONTAINED — line 43 is an added line"
+    },
+    {
+      "id": "F2",
+      "file": "app/Http/Controllers/PurchaseController.php",
+      "line": 88,
+      "severity": "MAJOR",
+      "claim": "still calls grant() with two arguments; without the third, every purchase from this path keeps the old non-idempotent behaviour",
+      "caused_by": "app/Services/EntitlementService.php:H1",
+      "_class": "DIFF-CAUSED — file is not in the diff, but H1 changed the signature it calls"
+    },
+    {
+      "id": "F3",
+      "file": "app/Services/EntitlementService.php",
+      "line": 41,
+      "severity": "MAJOR",
+      "claim": "this class builds SQL by string concatenation throughout",
+      "_class": "DIFF-ADJACENT — line 41 is a context line, visible in the hunk but not changed. Real problem, wrong PR."
+    },
+    {
+      "id": "F4",
+      "scope": "pr-level",
+      "severity": "MAJOR",
+      "claim": "changes idempotency behaviour of entitlement granting and adds no test for the retry path",
+      "_class": "PR-LEVEL — a property of the change, not of one line"
+    },
+    {
+      "id": "F5",
+      "file": "app/Services/LegacyBillingService.php",
+      "line": 12,
+      "severity": "BLOCKER",
+      "claim": "logs full receipt payloads including the signed JWS",
+      "_class": "NOT-IN-PR — genuinely a BLOCKER, but of its own PR. Open an issue."
+    },
+    {
+      "id": "F6",
+      "file": "app/Services/EntitlementService.php",
+      "line": 44,
+      "severity": "NIT",
+      "claim": "the early return could use the existing guard-clause helper",
+      "_class": "DIFF-CONTAINED but NIT — in scope, never blocking"
+    },
+    {
+      "id": "F7",
+      "file": "app/Services/EntitlementService.php",
+      "line": 210,
+      "severity": "MAJOR",
+      "claim": "revoke() further down the same class has no dedupe at all",
+      "_class": "PRE-EXISTING — same file as the diff, but outside every hunk. Real gap, not this PR's."
+    }
+  ]
+}

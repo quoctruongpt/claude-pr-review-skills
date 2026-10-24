@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "diff-scoped-review findings input",
+  "description": "Input for finding_scope_gate.py. Each finding must anchor to the diff: file+line, or scope 'pr-level', or file+line+caused_by when the line sits outside the diff.",
+  "type": "object",
+  "required": ["findings"],
+  "properties": {
+    "pr": {
+      "type": "string",
+      "description": "Optional label, e.g. owner/repo#123 or a branch name. Not used by the gate."
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["severity", "claim"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Short label (F1, F2...) so the report can be discussed without quoting the claim."
+          },
+          "file": {
+            "type": "string",
+            "description": "Path exactly as it appears in the diff (new-side path). Omit only when scope is 'pr-level'."
+          },
+          "line": {
+            "type": "integer",
+            "description": "Line number. On the new side unless 'side' says otherwise."
+          },
+          "side": {
+            "type": "string",
+            "enum": ["new", "old"],
+            "default": "new",
+            "description": "'old' when the finding is about a removed line (deleted validation, deleted test case)."
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["BLOCKER", "MAJOR", "MINOR", "NIT"],
+            "description": "BLOCKER/MAJOR block the PR when in scope. MINOR/NIT never block. Severity describes the bug; scope decides which PR pays for it."
+          },
+          "claim": {
+            "type": "string",
+            "description": "What is wrong, one sentence, falsifiable. Not 'this looks fragile'."
+          },
+          "caused_by": {
+            "type": "string",
+            "description": "Required when the finding's line is outside the diff. Format 'path:HUNK_ID' (app/X.php:H1) or 'path:LINE' (app/X.php:142), pointing at a real added/removed line or hunk in the surface. An unresolvable value is rejected, not demoted."
+          },
+          "scope": {
+            "type": "string",
+            "enum": ["pr-level"],
+            "description": "Set to 'pr-level' for findings about the whole change (no test for the new retry path, migration without rollback, description does not match the diff). No file/line needed."
+          }
+        }
+      }
+    }
+  }
+}
