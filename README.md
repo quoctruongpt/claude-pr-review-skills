@@ -7,7 +7,7 @@ Bộ review PR cho Claude Code, tùy chỉnh cho dev full stack: TypeScript/Node
 ## Cài
 
 ```bash
-gh repo clone quoctruongkt/claude-pr-review-skills ~/claude-pr-review-skills
+gh repo clone quoctruongpt/claude-pr-review-skills ~/claude-pr-review-skills
 ~/claude-pr-review-skills/install.sh
 ```
 
